@@ -1,0 +1,263 @@
+# API_CONTRACT.md
+
+## Auth Endpoints
+
+### POST /api/auth/login
+
+| Property         | Value                       |
+|------------------|----------------------------|
+| HTTP Method      | POST                       |
+| Path             | /api/auth/login            |
+| Auth Required    | No                         |
+| Request Body     | `UserLoginRequest`         |
+| Response Body    | `UserLoginResponse`        |
+| Status Codes     | 200                        |
+
+#### Request Body: UserLoginRequest
+
+| Field    | Type    | Required |
+|----------|---------|----------|
+| email    | string  | Yes      |
+| password | string  | Yes      |
+
+#### Response Body: UserLoginResponse
+
+| Field | Type    |
+|-------|---------|
+| token | string  |
+| user  | object  |
+
+`user` object:
+
+| Field | Type   |
+|-------|--------|
+| id    | string |
+| email | string |
+| name  | string |
+
+---
+
+### GET /api/auth/me
+
+| Property         | Value                                         |
+|------------------|----------------------------------------------|
+| HTTP Method      | GET                                          |
+| Path             | /api/auth/me                                 |
+| Auth Required    | Yes (`Authorization: Bearer <token>`)        |
+| Request Body     | None                                         |
+| Response Body    | `{ id: string; email: string; name: string; }`|
+| Status Codes     | 200                                          |
+
+#### Response Body
+
+| Field | Type   |
+|-------|--------|
+| id    | string |
+| email | string |
+| name  | string |
+
+---
+
+## Opportunity Endpoints
+
+### GET /api/opportunities
+
+| Property         | Value                                  |
+|------------------|----------------------------------------|
+| HTTP Method      | GET                                    |
+| Path             | /api/opportunities                     |
+| Auth Required    | Yes (`Authorization: Bearer <token>`)  |
+| Request Body     | None                                   |
+| Response Body    | `Opportunity[]`                        |
+| Status Codes     | 200                                    |
+
+#### Response Body: Opportunity[]
+
+Each `Opportunity`:
+
+| Field     | Type                                                                 |
+|-----------|----------------------------------------------------------------------|
+| id        | string                                                               |
+| name      | string                                                               |
+| company   | string                                                               |
+| value     | number                                                               |
+| stage     | 'lead' \| 'contacted' \| 'qualified' \| 'proposal' \| 'won' \| 'lost'|
+| ownerId   | string                                                               |
+| createdAt | string                                                               |
+| updatedAt | string                                                               |
+
+---
+
+### GET /api/opportunities/:id
+
+| Property         | Value                                  |
+|------------------|----------------------------------------|
+| HTTP Method      | GET                                    |
+| Path             | /api/opportunities/:id                 |
+| Auth Required    | Yes (`Authorization: Bearer <token>`)  |
+| Request Body     | None                                   |
+| Response Body    | `Opportunity`                          |
+| Status Codes     | 200                                    |
+
+#### Response Body: Opportunity
+
+| Field     | Type                                                                 |
+|-----------|----------------------------------------------------------------------|
+| id        | string                                                               |
+| name      | string                                                               |
+| company   | string                                                               |
+| value     | number                                                               |
+| stage     | 'lead' \| 'contacted' \| 'qualified' \| 'proposal' \| 'won' \| 'lost'|
+| ownerId   | string                                                               |
+| createdAt | string                                                               |
+| updatedAt | string                                                               |
+
+---
+
+### POST /api/opportunities
+
+| Property         | Value                                  |
+|------------------|----------------------------------------|
+| HTTP Method      | POST                                   |
+| Path             | /api/opportunities                     |
+| Auth Required    | Yes (`Authorization: Bearer <token>`)  |
+| Request Body     | `OpportunityCreate`                    |
+| Response Body    | `Opportunity`                          |
+| Status Codes     | 200                                    |
+
+#### Request Body: OpportunityCreate
+
+| Field   | Type                                                                 |
+|---------|----------------------------------------------------------------------|
+| name    | string                                                               |
+| company | string                                                               |
+| value   | number                                                               |
+| stage   | 'lead' \| 'contacted' \| 'qualified' \| 'proposal' \| 'won' \| 'lost'|
+
+#### Response Body: Opportunity
+
+| Field     | Type                                                                 |
+|-----------|----------------------------------------------------------------------|
+| id        | string                                                               |
+| name      | string                                                               |
+| company   | string                                                               |
+| value     | number                                                               |
+| stage     | 'lead' \| 'contacted' \| 'qualified' \| 'proposal' \| 'won' \| 'lost'|
+| ownerId   | string                                                               |
+| createdAt | string                                                               |
+| updatedAt | string                                                               |
+
+---
+
+### PUT /api/opportunities/:id
+
+| Property         | Value                                  |
+|------------------|----------------------------------------|
+| HTTP Method      | PUT                                    |
+| Path             | /api/opportunities/:id                 |
+| Auth Required    | Yes (`Authorization: Bearer <token>`)  |
+| Request Body     | `OpportunityCreate`                    |
+| Response Body    | `Opportunity`                          |
+| Status Codes     | 200                                    |
+
+#### Request Body: OpportunityCreate
+
+| Field   | Type                                                                 |
+|---------|----------------------------------------------------------------------|
+| name    | string                                                               |
+| company | string                                                               |
+| value   | number                                                               |
+| stage   | 'lead' \| 'contacted' \| 'qualified' \| 'proposal' \| 'won' \| 'lost'|
+
+#### Response Body: Opportunity
+
+| Field     | Type                                                                 |
+|-----------|----------------------------------------------------------------------|
+| id        | string                                                               |
+| name      | string                                                               |
+| company   | string                                                               |
+| value     | number                                                               |
+| stage     | 'lead' \| 'contacted' \| 'qualified' \| 'proposal' \| 'won' \| 'lost'|
+| ownerId   | string                                                               |
+| createdAt | string                                                               |
+| updatedAt | string                                                               |
+
+---
+
+### DELETE /api/opportunities/:id
+
+| Property         | Value                                  |
+|------------------|----------------------------------------|
+| HTTP Method      | DELETE                                 |
+| Path             | /api/opportunities/:id                 |
+| Auth Required    | Yes (`Authorization: Bearer <token>`)  |
+| Request Body     | None                                   |
+| Response Body    | `{ success: boolean; }`                |
+| Status Codes     | 200                                    |
+
+#### Response Body
+
+| Field   | Type    |
+|---------|---------|
+| success | boolean |
+
+---
+
+## Interaction Endpoints
+
+### GET /api/interactions?opportunityId=...
+
+| Property         | Value                                  |
+|------------------|----------------------------------------|
+| HTTP Method      | GET                                    |
+| Path             | /api/interactions                      |
+| Auth Required    | Yes (`Authorization: Bearer <token>`)  |
+| Query Params     | opportunityId: string                  |
+| Request Body     | None                                   |
+| Response Body    | `Interaction[]`                        |
+| Status Codes     | 200                                    |
+
+#### Response Body: Interaction[]
+
+Each `Interaction`:
+
+| Field         | Type                                         |
+|---------------|----------------------------------------------|
+| id            | string                                       |
+| opportunityId | string                                       |
+| userId        | string                                       |
+| type          | 'call' \| 'email' \| 'meeting' \| 'note'     |
+| content       | string                                       |
+| createdAt     | string                                       |
+
+---
+
+### POST /api/interactions
+
+| Property         | Value                                  |
+|------------------|----------------------------------------|
+| HTTP Method      | POST                                   |
+| Path             | /api/interactions                      |
+| Auth Required    | Yes (`Authorization: Bearer <token>`)  |
+| Request Body     | `InteractionCreate`                    |
+| Response Body    | `Interaction`                          |
+| Status Codes     | 200                                    |
+
+#### Request Body: InteractionCreate
+
+| Field         | Type                                     |
+|---------------|------------------------------------------|
+| opportunityId | string                                   |
+| type          | 'call' \| 'email' \| 'meeting' \| 'note' |
+| content       | string                                   |
+
+#### Response Body: Interaction
+
+| Field         | Type                                     |
+|---------------|------------------------------------------|
+| id            | string                                   |
+| opportunityId | string                                   |
+| userId        | string                                   |
+| type          | 'call' \| 'email' \| 'meeting' \| 'note' |
+| content       | string                                   |
+| createdAt     | string                                   |
