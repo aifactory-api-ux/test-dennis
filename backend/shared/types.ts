@@ -9,8 +9,8 @@ export interface Opportunity {
   value: number;
   stage: OpportunityStage;
   ownerId: string;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface OpportunityCreate {
@@ -33,9 +33,9 @@ export interface Prospect {
   phone: string;
   status: string;
   notes: string;
-  userId: string;
-  createdAt: string;
-  updatedAt: string;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface ProspectCreate {
@@ -47,11 +47,67 @@ export interface ProspectCreate {
   notes: string;
 }
 
+// User types
+export interface UserLoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface UserLoginResponse {
+  token: string;
+  user: UserResponse;
+}
+
+export interface UserResponse {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+}
+
 // Interaction types
 export type InteractionType = 'call' | 'email' | 'meeting' | 'note';
 export const INTERACTION_TYPES: InteractionType[] = ['call', 'email', 'meeting', 'note'];
 
 export function isValidInteractionType(type: string): type is InteractionType {
   return INTERACTION_TYPES.includes(type as InteractionType);
+}
+
+export interface Interaction {
+  id: string;
+  type: InteractionType;
+  content: string;
+  opportunityId: string;
+  userId: string;
+  createdAt: string;
+}
+
+export interface InteractionCreate {
+  type: InteractionType;
+  content: string;
+  opportunityId: string;
+}
+
+// Task types
+export interface Task {
+  id: string;
+  title: string;
+  description: string;
+  status: string;
+  dueDate: string;
+  completedDate?: string;
+  opportunityId: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TaskCreate {
+  title: string;
+  description: string;
+  status: string;
+  dueDate: string;
+  completedDate?: string;
+  opportunityId: string;
 }
 

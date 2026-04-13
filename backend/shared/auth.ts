@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 
 export interface TokenPayload {
   userId: string;
@@ -22,6 +23,18 @@ export function extractTokenFromHeader(authHeader?: string): string | null {
 export function verifyToken(token: string): TokenPayload {
   const secret = process.env.JWT_SECRET || 'secret';
   return jwt.verify(token, secret) as TokenPayload;
+}
+
+export function generateToken(payload: TokenPayload): string {
+  const secret = process.env.JWT_SECRET || 'secret';
+  return jwt.sign(payload, secret, { expiresIn: '24h' });
+}
+
+export function comparePassword(password: string, hash: string): boolean {
+  const salt = hash.substring(0, 32);
+  const hashMatch = hash.substring(32);
+  const newHash = crypto.createHash('sha256').update(password + salt).digest('hex');
+  return newHash === hashMatch;
 }
 
 export function authMiddleware() {

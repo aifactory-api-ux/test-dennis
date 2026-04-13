@@ -60,7 +60,8 @@ export async function login(req: Request, res: Response): Promise<void> {
       user: {
         id: user.id,
         email: user.email,
-        name: user.name
+        name: user.name,
+        role: user.role || "user"
       }
     };
 
@@ -98,7 +99,8 @@ export async function getCurrentUser(req: AuthenticatedRequest, res: Response): 
     const userResponse: UserResponse = {
       id: user.id,
       email: user.email,
-      name: user.name
+      name: user.name,
+        role: user.role || "user"
     };
 
     res.status(200).json(userResponse);
