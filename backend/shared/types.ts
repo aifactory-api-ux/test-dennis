@@ -110,4 +110,3 @@ export interface TaskCreate {
   completedDate?: string;
   opportunityId: string;
 }
-

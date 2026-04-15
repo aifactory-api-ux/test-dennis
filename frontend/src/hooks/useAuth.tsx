@@ -1,10 +1,10 @@
 import { useState, useContext, createContext } from 'react';
-import { User, UserLoginRequest, UserLoginResponse } from '../types/user';
+import { UserLoginRequest, UserLoginResponse, CurrentUser } from '../types/user';
 import { login as apiLogin } from '../api/auth';
 
 // Extended AuthContextType to include error and isLoading for hooks
 interface AuthContextType {
-  user: User | null;
+  user: CurrentUser | null;
   token: string | null;
   login: (credentials: UserLoginRequest) => Promise<void>;
   logout: () => void;
@@ -24,7 +24,7 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<CurrentUser | null>(null);
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

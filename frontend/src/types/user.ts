@@ -14,9 +14,9 @@ export interface User {
   /** User's full name */
   name: string;
   /** Hashed password (backend only, not exposed to frontend) */
-  passwordHash: string;
+  passwordHash?: string;
   /** Account creation timestamp */
-  createdAt: string;
+  createdAt?: string;
 }
 
 /**
