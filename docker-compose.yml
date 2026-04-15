@@ -3,7 +3,6 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: test-dennis-postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
@@ -22,12 +21,11 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: test-dennis-redis
     command: redis-server --appendonly yes
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
     ports:
-      - "${REDIS_PORT:-6379}:6379"
+      - "63790:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -42,7 +40,6 @@ services:
     build:
       context: ./backend/auth-service
       dockerfile: Dockerfile
-    container_name: test-dennis-auth
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       PORT: ${AUTH_SERVICE_PORT:-8001}
@@ -75,7 +72,6 @@ services:
     build:
       context: ./backend/opportunity-service
       dockerfile: Dockerfile
-    container_name: test-dennis-opportunity
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       PORT: ${OPPORTUNITY_SERVICE_PORT:-8002}
@@ -110,7 +106,6 @@ services:
     build:
       context: ./backend/interaction-service
       dockerfile: Dockerfile
-    container_name: test-dennis-interaction
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       PORT: ${INTERACTION_SERVICE_PORT:-8003}
@@ -145,7 +140,6 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: test-dennis-frontend
     environment:
       VITE_API_URL: http://localhost:80
       NODE_ENV: ${NODE_ENV:-development}
@@ -169,7 +163,6 @@ services:
 
   gateway:
     image: nginx:alpine
-    container_name: test-dennis-gateway
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
