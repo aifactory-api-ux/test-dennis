@@ -1,110 +1,61 @@
-import { useState, useCallback } from 'react';
-import { Opportunity, OpportunityCreate } from '../types/opportunity';
-import * as opportunitiesApi from '../api/opportunities';
+import { useState, useEffect } from 'react';
+import * as api from '../api/opportunities';
+import type { Opportunity, OpportunityCreate, OpportunityUpdate } from '../types/opportunity';
 
 export interface UseOpportunitiesReturn {
   opportunities: Opportunity[];
-  loading: boolean;
+  isLoading: boolean;
   error: string | null;
-  fetchOpportunities: () => Promise<void>;
-  getOpportunity: (id: string) => Promise<Opportunity | null>;
-  createOpportunity: (data: OpportunityCreate) => Promise<Opportunity | null>;
-  updateOpportunity: (id: string, data: OpportunityCreate) => Promise<Opportunity | null>;
-  deleteOpportunity: (id: string) => Promise<boolean>;
+  getOpportunity: (id: string) => Promise<Opportunity>;
+  createOpportunity: (data: OpportunityCreate) => Promise<Opportunity>;
+  updateOpportunity: (id: string, data: OpportunityUpdate) => Promise<Opportunity>;
+  deleteOpportunity: (id: string) => Promise<void>;
+  refetch: () => Promise<void>;
 }
 
 export function useOpportunities(): UseOpportunitiesReturn {
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchOpportunities = useCallback(async (): Promise<void> => {
-    setLoading(true);
+  const fetchOpportunities = async () => {
+    setIsLoading(true);
     setError(null);
     try {
-      const data = await opportunitiesApi.getOpportunities();
+      const data = await api.getOpportunities();
       setOpportunities(data);
-    } catch (err: any) {
-      setError(err.message || 'Error al cargar oportunidades');
-      setOpportunities([]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch opportunities');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  }, []);
+  };
 
-  const getOpportunity = useCallback(async (id: string): Promise<Opportunity | null> => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await opportunitiesApi.getOpportunity(id);
-      return data;
-    } catch (err: any) {
-      setError(err.message || 'Error al cargar oportunidad');
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const createOpportunity = useCallback(async (data: OpportunityCreate): Promise<Opportunity | null> => {
-    setLoading(true);
-    setError(null);
-    try {
-      const newOpportunity = await opportunitiesApi.createOpportunity(data);
-      setOpportunities(prev => [...prev, newOpportunity]);
-      return newOpportunity;
-    } catch (err: any) {
-      setError(err.message || 'Error al crear oportunidad');
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const updateOpportunity = useCallback(async (id: string, data: OpportunityCreate): Promise<Opportunity | null> => {
-    setLoading(true);
-    setError(null);
-    try {
-      const updatedOpportunity = await opportunitiesApi.updateOpportunity(id, data);
-      setOpportunities(prev =>
-        prev.map(opp => (opp.id === id ? updatedOpportunity : opp))
-      );
-      return updatedOpportunity;
-    } catch (err: any) {
-      setError(err.message || 'Error al actualizar oportunidad');
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const deleteOpportunity = useCallback(async (id: string): Promise<boolean> => {
-    setLoading(true);
-    setError(null);
-    try {
-      const success = await opportunitiesApi.deleteOpportunity(id);
-      if (success) {
-        setOpportunities(prev => prev.filter(opp => opp.id !== id));
-      }
-      return success;
-    } catch (err: any) {
-      setError(err.message || 'Error al eliminar oportunidad');
-      return false;
-    } finally {
-      setLoading(false);
-    }
+  useEffect(() => {
+    fetchOpportunities();
   }, []);
 
   return {
     opportunities,
-    loading,
+    isLoading,
     error,
-    fetchOpportunities,
-    getOpportunity,
-    createOpportunity,
-    updateOpportunity,
-    deleteOpportunity,
+    getOpportunity: api.getOpportunity,
+    createOpportunity: async (data: OpportunityCreate) => {
+      const newOpportunity = await api.createOpportunity(data);
+      setOpportunities((prev) => [...prev, newOpportunity]);
+      return newOpportunity;
+    },
+    updateOpportunity: async (id: string, data: OpportunityUpdate) => {
+      const updated = await api.updateOpportunity(id, data);
+      setOpportunities((prev) =>
+        prev.map((opp) => (opp.id === id ? updated : opp))
+      );
+      return updated;
+    },
+    deleteOpportunity: async (id: string) => {
+      await api.deleteOpportunity(id);
+      setOpportunities((prev) => prev.filter((opp) => opp.id !== id));
+    },
+    refetch: fetchOpportunities,
   };
 }
-
-export default useOpportunities;

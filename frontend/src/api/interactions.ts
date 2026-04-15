@@ -1,42 +1,52 @@
 import type { Interaction, InteractionCreate } from '../types/interaction';
 
-const API_BASE = '/api/interactions';
+const BASE_URL = '/api/interactions';
 
-function getAuthHeader() {
-  const token = localStorage.getItem('auth_token');
-  return token ? { 'Authorization': `Bearer ${token}` } : {};
-}
+export const interactionsApi = {
+  getAll: async (): Promise<Interaction[]> => {
+    const response = await fetch(BASE_URL, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    });
+    if (!response.ok) throw new Error('Failed to fetch interactions');
+    return response.json();
+  },
 
-export async function getInteractions(opportunityId?: string): Promise<Interaction[]> {
-  let url = API_BASE;
-  if (opportunityId) {
-    url += `?opportunityId=${encodeURIComponent(opportunityId)}`;
-  }
-  const res = await fetch(url, {
-    method: 'GET',
-    headers: {
-      ...getAuthHeader(),
-    },
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || 'Error al obtener interacciones');
-  }
-  return res.json();
-}
+  getById: async (id: string): Promise<Interaction> => {
+    const response = await fetch(`${BASE_URL}/${id}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    });
+    if (!response.ok) throw new Error('Failed to fetch interaction');
+    return response.json();
+  },
 
-export async function createInteraction(data: InteractionCreate): Promise<Interaction> {
-  const res = await fetch(API_BASE, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...getAuthHeader(),
-    },
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || 'Error al crear interacción');
-  }
-  return res.json();
-}
+  getByOpportunity: async (opportunityId: string): Promise<Interaction[]> => {
+    const response = await fetch(`${BASE_URL}?opportunityId=${opportunityId}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    });
+    if (!response.ok) throw new Error('Failed to fetch interactions');
+    return response.json();
+  },
+
+  create: async (data: InteractionCreate): Promise<Interaction> => {
+    const response = await fetch(BASE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error('Failed to create interaction');
+    return response.json();
+  },
+
+  delete: async (id: string): Promise<void> => {
+    const response = await fetch(`${BASE_URL}/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    });
+    if (!response.ok) throw new Error('Failed to delete interaction');
+  },
+};
+
+export const getInteractions = interactionsApi.getAll;

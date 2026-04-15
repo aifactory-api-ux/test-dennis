@@ -3,9 +3,11 @@
  * Mirrors the backend types from SPEC.md and shared foundation
  */
 
-import type { OpportunityStage } from '../../backend/shared/types';
+// Define OpportunityStage locally since backend path doesn't exist
+export type OpportunityStage = 'Prospecting' | 'Qualification' | 'Proposal' | 'Negotiation' | 'Closed Won' | 'Closed Lost';
 
-export type { OpportunityStage };
+// Type for stage-to-label mapping (includes 'lead' for backwards compatibility)
+export type OpportunityStageLabel = Record<OpportunityStage, string> & { lead: string };
 
 /**
  * Opportunity entity representing a sales opportunity in the pipeline
@@ -59,87 +61,13 @@ export interface OpportunityUpdate {
 }
 
 /**
- * Filter options for querying opportunities
+ * Props for the OpportunityList component
  */
-export interface OpportunityFilter {
-  /** Filter by stage */
-  stage?: OpportunityStage;
-  /** Filter by owner */
-  ownerId?: string;
-  /** Search term for name/company */
-  search?: string;
-  /** Minimum value filter */
-  minValue?: number;
-  /** Maximum value filter */
-  maxValue?: number;
-}
-
-/**
- * Sort options for opportunity list
- */
-export interface OpportunitySort {
-  /** Field to sort by */
-  field: 'name' | 'company' | 'value' | 'stage' | 'createdAt' | 'updatedAt';
-  /** Sort direction */
-  direction: 'asc' | 'desc';
-}
-
-/**
- * Paginated response for opportunities
- */
-export interface OpportunityPaginatedResponse {
-  /** Array of opportunities */
+export interface OpportunityListProps {
+  /** List of opportunities to display */
   opportunities: Opportunity[];
-  /** Total count matching the filter */
-  total: number;
-  /** Current page number */
-  page: number;
-  /** Page size */
-  limit: number;
-  /** Total pages available */
-  totalPages: number;
-}
-
-/**
- * Stage statistics for dashboard
- */
-export interface StageStats {
-  /** Stage identifier */
-  stage: OpportunityStage;
-  /** Count of opportunities in this stage */
-  count: number;
-  /** Total value in this stage */
-  value: number;
-}
-
-/**
- * Dashboard summary statistics
- */
-export interface DashboardStats {
-  /** Total opportunities count */
-  totalOpportunities: number;
-  /** Total pipeline value */
-  totalValue: number;
-  /** Count by stage */
-  stageStats: StageStats[];
-  /** Won opportunities value */
-  wonValue: number;
-  /** Won opportunities count */
-  wonCount: number;
-  /** Lost opportunities count */
-  lostCount: number;
-}
-
-/**
- * Pipeline Kanban column data
- */
-export interface PipelineColumn {
-  /** Stage for this column */
-  stage: OpportunityStage;
-  /** Label to display */
-  label: string;
-  /** Opportunities in this stage */
-  opportunities: Opportunity[];
-  /** Total value in this stage */
-  value: number;
+  /** Callback when an opportunity is deleted */
+  onDelete?: (id: string) => Promise<void>;
+  /** Callback when an opportunity is edited */
+  onEdit?: (opportunity: Opportunity | null) => void;
 }

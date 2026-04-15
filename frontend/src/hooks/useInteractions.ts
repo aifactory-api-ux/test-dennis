@@ -1,55 +1,51 @@
-import { useState, useCallback } from 'react';
-import { Interaction, InteractionCreate } from '../types/interaction';
-import * as api from '../api/interactions';
+import { useState, useEffect, useCallback } from 'react';
+import type { Interaction, InteractionCreate } from '../types/interaction';
+import { interactionsApi } from '../api/interactions';
 
-interface UseInteractionsReturn {
+export interface UseInteractionsReturn {
   interactions: Interaction[];
   loading: boolean;
   error: string | null;
-  fetchInteractions: (opportunityId?: string) => Promise<void>;
+  fetchInteractions: () => Promise<void>;
   createInteraction: (data: InteractionCreate) => Promise<Interaction>;
-  clearError: () => void;
+  deleteInteraction: (id: string) => Promise<void>;
+  refetch: () => Promise<void>;
 }
 
-export function useInteractions(): UseInteractionsReturn {
+export function useInteractions(opportunityId?: string): UseInteractionsReturn {
   const [interactions, setInteractions] = useState<Interaction[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchInteractions = useCallback(async (opportunityId?: string): Promise<void> => {
-    setLoading(true);
-    setError(null);
-    
+  const fetchInteractions = useCallback(async () => {
     try {
-      const data = await api.getInteractions(opportunityId);
+      setLoading(true);
+      setError(null);
+      const data = opportunityId
+        ? await interactionsApi.getByOpportunity(opportunityId)
+        : await interactionsApi.getAll();
       setInteractions(data);
-    } catch (err: any) {
-      setError(err.message || 'Error al obtener interacciones');
-      setInteractions([]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error fetching interactions');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [opportunityId]);
 
   const createInteraction = useCallback(async (data: InteractionCreate): Promise<Interaction> => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const newInteraction = await api.createInteraction(data);
-      setInteractions((prev) => [newInteraction, ...prev]);
-      return newInteraction;
-    } catch (err: any) {
-      setError(err.message || 'Error al crear interacción');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
+    const newInteraction = await interactionsApi.create(data);
+    setInteractions((prev) => [...prev, newInteraction]);
+    return newInteraction;
   }, []);
 
-  const clearError = useCallback((): void => {
-    setError(null);
+  const deleteInteraction = useCallback(async (id: string): Promise<void> => {
+    await interactionsApi.delete(id);
+    setInteractions((prev) => prev.filter((int) => int.id !== id));
   }, []);
+
+  useEffect(() => {
+    fetchInteractions();
+  }, [fetchInteractions]);
 
   return {
     interactions,
@@ -57,6 +53,7 @@ export function useInteractions(): UseInteractionsReturn {
     error,
     fetchInteractions,
     createInteraction,
-    clearError,
+    deleteInteraction,
+    refetch: fetchInteractions,
   };
 }

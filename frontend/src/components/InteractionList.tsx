@@ -1,83 +1,43 @@
-import { Interaction, InteractionType } from '../types/interaction';
+/**
+ * InteractionList component - Displays a list of interactions
+ */
+
+import type { Interaction } from '../types/interaction';
 
 interface InteractionListProps {
+  /** List of interactions to display */
   interactions: Interaction[];
-  loading?: boolean;
-  error?: string | null;
+  /** Callback when an interaction is deleted */
+  onDelete?: (id: string) => void;
 }
 
-const typeIcons: Record<InteractionType, string> = {
-  call: '📞',
-  email: '📧',
-  meeting: '📅',
-  note: '📝',
-};
-
-const typeLabels: Record<InteractionType, string> = {
-  call: 'Llamada',
-  email: 'Correo',
-  meeting: 'Reunión',
-  note: 'Nota',
-};
-
-function formatDateTime(dateString: string): string {
-  return new Date(dateString).toLocaleString('es-MX', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
-export default function InteractionList({ interactions, loading, error }: InteractionListProps) {
-  if (loading) {
-    return (
-      <div className="loading">
-        <span>Cargando interacciones...</span>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="error-message">
-        <p>{error}</p>
-      </div>
-    );
-  }
-
+export default function InteractionList({ interactions, onDelete }: InteractionListProps) {
   if (interactions.length === 0) {
-    return (
-      <div style={{ padding: '1rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
-        No hay interacciones registradas.
-      </div>
-    );
+    return <div className="text-gray-500">No interactions yet</div>;
   }
 
   return (
-    <div className="interaction-list">
+    <div className="space-y-3">
       {interactions.map((interaction) => (
-        <div
-          key={interaction.id}
-          style={{
-            padding: '1rem',
-            borderBottom: '1px solid var(--border)',
-            display: 'flex',
-            gap: '1rem',
-          }}
-        >
-          <div style={{ fontSize: '1.5rem' }}>{typeIcons[interaction.type]}</div>
-          <div style={{ flex: 1 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-              <span style={{ fontWeight: 500 }}>{typeLabels[interaction.type]}</span>
-              <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                {formatDateTime(interaction.createdAt)}
+        <div key={interaction.id} className="border-l-4 border-blue-500 pl-4 py-2">
+          <div className="flex justify-between items-start">
+            <div>
+              <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-medium">
+                {interaction.type}
               </span>
+              <p className="mt-2">{interaction.content}</p>
+              <p className="text-sm text-gray-500 mt-1">
+                {new Date(interaction.createdAt).toLocaleString()}
+              </p>
             </div>
-            <p style={{ color: 'var(--text-secondary)', whiteSpace: 'pre-wrap' }}>
-              {interaction.content}
-            </p>
+            {onDelete && (
+              <button
+                onClick={() => onDelete(interaction.id)}
+                className="text-red-500 hover:text-red-700"
+              >
+                Delete
+              </button>
+            )}
           </div>
         </div>
       ))}

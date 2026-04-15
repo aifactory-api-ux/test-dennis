@@ -68,6 +68,15 @@ export interface CurrentUser {
   email: string;
   /** User's full name */
   name: string;
-  /** JWT token for API requests */
-  token: string;
+}
+
+/**
+ * Auth context type used in the application
+ */
+export interface AuthContextType {
+  user: CurrentUser | null;
+  token: string | null;
+  isLoading: boolean;
+  login: (credentials: UserLoginRequest) => Promise<void>;
+  logout: () => void;
 }
