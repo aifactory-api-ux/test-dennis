@@ -4,13 +4,12 @@
  * Listening Port: 8003
  */
 
-import express, { Application, Request, Response, NextFunction } from 'express';
+import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-import { v4 as uuidv4 } from 'uuid';
-import { query, getPool, checkDatabaseConnection } from '../shared/db';
-import { authMiddleware, verifyToken, TokenPayload, extractTokenFromHeader } from '../shared/auth';
+import { getPool, checkDatabaseConnection } from '../shared/db';
+import { authMiddleware, verifyToken, TokenPayload } from '../shared/auth';
 import { Interaction, InteractionCreate, Task, TaskCreate, InteractionType } from '../shared/types';
 
 // Load environment variables
@@ -85,7 +84,7 @@ async function initializeDatabase(): Promise<void> {
 
 // ============== HEALTH CHECK ==============
 
-app.get('/health', async (req: Request, res: Response) => {
+app.get('/health', async (_req: Request, res: Response) => {
   try {
     const dbHealthy = await checkDatabaseConnection();
     

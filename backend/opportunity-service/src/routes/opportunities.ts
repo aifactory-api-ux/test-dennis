@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authMiddleware, AuthenticatedRequest } from '../../../shared/auth';
+import { authMiddleware, AuthenticatedRequest } from '../../shared/auth';
 import {
   getAllOpportunities,
   getOpportunityById,

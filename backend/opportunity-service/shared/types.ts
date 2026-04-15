@@ -42,6 +42,40 @@ export interface OpportunityUpdate {
   stage?: OpportunityStage;
 }
 
+// Prospect types - alias for Opportunity in early stage
+// Prospect represents an Opportunity in the 'lead' or 'contacted' stage
+export type ProspectStage = 'lead' | 'contacted';
+
+export const PROSPECT_STAGES: ProspectStage[] = [
+  'lead',
+  'contacted'
+];
+
+export interface Prospect {
+  id: string;
+  name: string;
+  company: string;
+  value: number;
+  stage: ProspectStage;
+  ownerId: string;
+  status: string;
+  notes: string;
+  user_id: string;
+  email: string;
+  phone: string;
+  createdAt: string;
+  updatedAt: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProspectCreate {
+  name: string;
+  company: string;
+  value: number;
+  stage: ProspectStage;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -95,6 +129,15 @@ export const INTERACTION_TYPES: InteractionType[] = [
  */
 export function isValidOpportunityStage(stage: string): stage is OpportunityStage {
   return OPPORTUNITY_STAGES.includes(stage as OpportunityStage);
+}
+
+/**
+ * Validate if a string is a valid prospect stage
+ * @param stage - Stage string to validate
+ * @returns True if valid stage
+ */
+export function isValidProspectStage(stage: string): stage is ProspectStage {
+  return PROSPECT_STAGES.includes(stage as ProspectStage);
 }
 
 /**

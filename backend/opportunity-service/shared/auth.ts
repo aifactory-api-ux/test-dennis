@@ -4,7 +4,7 @@
  * This file provides local access to shared auth utilities
  */
 
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 
@@ -49,7 +49,7 @@ export function verifyToken(token: string): TokenPayload {
 export function generateToken(payload: TokenPayload): string {
   const secret = process.env.JWT_SECRET || 'secret';
   const expiresIn = process.env.JWT_EXPIRES_IN || '24h';
-  return jwt.sign(payload, secret, { expiresIn });
+  return jwt.sign(payload, secret, { expiresIn: expiresIn as SignOptions['expiresIn'] });
 }
 
 /**

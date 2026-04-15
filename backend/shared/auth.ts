@@ -27,7 +27,10 @@ export function verifyToken(token: string): TokenPayload {
 
 export function generateToken(payload: TokenPayload): string {
   const secret = process.env.JWT_SECRET || 'secret';
-  return jwt.sign(payload, secret, { expiresIn: '24h' });
+  const options: jwt.SignOptions = {
+    expiresIn: '24h' as jwt.SignOptions['expiresIn']
+  };
+  return jwt.sign(payload, secret, options);
 }
 
 export function comparePassword(password: string, hash: string): boolean {

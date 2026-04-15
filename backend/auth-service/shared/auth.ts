@@ -17,10 +17,12 @@ export interface AuthenticatedRequest extends Request {
   user?: TokenPayload;
 }
 
-const JWT_SECRET = process.env.JWT_SECRET || 'secret';
+const JWT_SECRET: string = process.env.JWT_SECRET || 'secret';
 
 export function generateToken(payload: TokenPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+  // 7 days in seconds
+  const expiresIn = 7 * 24 * 60 * 60;
+  return jwt.sign(payload, JWT_SECRET, { expiresIn });
 }
 
 export function verifyToken(token: string): TokenPayload {

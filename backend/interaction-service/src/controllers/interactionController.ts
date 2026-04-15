@@ -5,7 +5,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import { query as dbQuery, getPool } from '../../shared/db';
+import { query as dbQuery } from '../../shared/db';
 import { authMiddleware, AuthenticatedRequest } from '../../shared/auth';
 import { Interaction, InteractionCreate, InteractionType } from '../../shared/types';
 
@@ -309,9 +309,9 @@ export async function deleteInteraction(
 
 export function errorHandler(
   err: Error,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ): void {
   console.error('Interaction Controller Error:', err);
 

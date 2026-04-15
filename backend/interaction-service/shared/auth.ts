@@ -5,7 +5,7 @@
  */
 
 import jwt from 'jsonwebtoken';
-import { Request, Response, NextFunction } from 'express';
+import { Request, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 
 export interface TokenPayload {
@@ -48,7 +48,7 @@ export function verifyToken(token: string): TokenPayload {
  */
 export function generateToken(payload: TokenPayload): string {
   const secret = process.env.JWT_SECRET || 'secret';
-  const expiresIn = process.env.JWT_EXPIRES_IN || '24h';
+  const expiresIn = (process.env.JWT_EXPIRES_IN || '24h') as jwt.SignOptions['expiresIn'];
   return jwt.sign(payload, secret, { expiresIn });
 }
 
@@ -86,12 +86,12 @@ export async function hashPassword(password: string): Promise<string> {
  * ```
  */
 export function authMiddleware() {
-  return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  return (req: AuthenticatedRequest, _res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
     const token = extractTokenFromHeader(authHeader);
 
     if (!token) {
-      return res.status(401).json({ error: 'Authorization token required' });
+      return _res.status(401).json({ error: 'Authorization token required' });
     }
 
     try {
@@ -99,7 +99,7 @@ export function authMiddleware() {
       req.user = decoded;
       next();
     } catch (err) {
-      return res.status(401).json({ error: 'Invalid token' });
+      return _res.status(401).json({ error: 'Invalid token' });
     }
   };
 }
@@ -109,7 +109,7 @@ export function authMiddleware() {
  * Useful for endpoints that can work with or without authentication
  */
 export function optionalAuthMiddleware() {
-  return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  return (req: AuthenticatedRequest, _res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
     const token = extractTokenFromHeader(authHeader);
 

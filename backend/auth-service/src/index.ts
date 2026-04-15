@@ -9,7 +9,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
-import { checkDatabaseConnection } from '../../shared/db';
+import { checkDatabaseConnection } from '../shared/db';
 
 // Load environment variables
 dotenv.config();
@@ -37,7 +37,7 @@ app.get('/health', async (req, res) => {
 });
 
 // Error handling middleware
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('Error:', err);
   res.status(500).json({ error: 'Internal server error' });
 });

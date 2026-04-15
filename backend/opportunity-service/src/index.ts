@@ -13,9 +13,9 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Import shared modules
-import { authMiddleware, AuthenticatedRequest } from '../../shared/auth';
-import { query, getPool } from '../../shared/db';
-import { Opportunity, OpportunityCreate, OpportunityStage, Prospect, ProspectCreate } from '../../shared/types';
+import { authMiddleware, AuthenticatedRequest } from '../shared/auth';
+import { query, getPool } from '../shared/db';
+import { Opportunity, OpportunityCreate, OpportunityStage, Prospect, ProspectCreate } from '../shared/types';
 
 // Import routes
 import opportunitiesRouter from './routes/opportunities';
@@ -87,8 +87,7 @@ app.get('/health', async (req: Request, res: Response) => {
 
 // ============== PROSPECTS ROUTER (Inline for simplicity) ==============
 
-import { Router } from 'express';
-const prospectsRouter = Router();
+const prospectsRouter = express.Router();
 
 // GET /api/prospects - List all prospects
 prospectsRouter.get('/', async (req: AuthenticatedRequest, res: Response) => {
@@ -161,7 +160,7 @@ app.use('/api/prospects', prospectsRouter);
 
 // ============== ERROR HANDLING ==============
 
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
   console.error('Error:', err);
   res.status(500).json({ error: 'Internal server error' });
 });

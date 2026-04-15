@@ -7,7 +7,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { body, query, param, validationResult } from 'express-validator';
 import { v4 as uuidv4 } from 'uuid';
-import { query as dbQuery, getPool } from '../../shared/db';
+import { query as dbQuery } from '../../shared/db';
 import { authMiddleware, AuthenticatedRequest } from '../../shared/auth';
 import { Interaction, InteractionCreate, Task, TaskCreate, InteractionType } from '../../shared/types';
 
@@ -56,7 +56,7 @@ router.get(
         FROM interactions
         WHERE user_id = $1
       `;
-      const queryParams: any[] = [userId];
+      const queryParams: unknown[] = [userId];
 
       if (opportunityId) {
         queryText += ' AND opportunity_id = $2';
@@ -67,17 +67,17 @@ router.get(
 
       const result = await dbQuery(queryText, queryParams);
 
-      const interactions: Interaction[] = result.rows.map((row: any) => ({
-        id: row.id,
-        opportunityId: row.opportunity_id,
-        userId: row.user_id,
+      const interactions: Interaction[] = result.rows.map((row: Record<string, unknown>) => ({
+        id: row.id as string,
+        opportunityId: row.opportunity_id as string,
+        userId: row.user_id as string,
         type: row.type as InteractionType,
-        content: row.content,
-        createdAt: row.created_at
+        content: row.content as string,
+        createdAt: row.created_at as string
       }));
 
       res.status(200).json(interactions);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching interactions:', error);
       res.status(500).json({ error: 'Failed to fetch interactions' });
     }
@@ -127,7 +127,7 @@ router.post(
       };
 
       res.status(201).json(interaction);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating interaction:', error);
       res.status(500).json({ error: 'Failed to create interaction' });
     }
@@ -164,7 +164,7 @@ router.get(
         FROM tasks
         WHERE user_id = $1
       `;
-      const queryParams: any[] = [userId];
+      const queryParams: unknown[] = [userId];
       let paramIndex = 2;
 
       if (opportunityId) {
@@ -182,21 +182,21 @@ router.get(
 
       const result = await dbQuery(queryText, queryParams);
 
-      const tasks: Task[] = result.rows.map((row: any) => ({
-        id: row.id,
-        title: row.title,
-        description: row.description,
-        status: row.status,
-        dueDate: row.due_date,
-        completedDate: row.completed_date,
-        opportunityId: row.opportunity_id,
-        userId: row.user_id,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at
+      const tasks: Task[] = result.rows.map((row: Record<string, unknown>) => ({
+        id: row.id as string,
+        title: row.title as string,
+        description: row.description as string,
+        status: row.status as 'pending' | 'in_progress' | 'completed',
+        dueDate: row.due_date as string,
+        completedDate: row.completed_date as string | null,
+        opportunityId: row.opportunity_id as string,
+        userId: row.user_id as string,
+        createdAt: row.created_at as string,
+        updatedAt: row.updated_at as string
       }));
 
       res.status(200).json(tasks);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching tasks:', error);
       res.status(500).json({ error: 'Failed to fetch tasks' });
     }
@@ -254,7 +254,7 @@ router.post(
       };
 
       res.status(201).json(task);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating task:', error);
       res.status(500).json({ error: 'Failed to create task' });
     }
@@ -292,7 +292,7 @@ router.put(
       // Build dynamic update query
       const allowedFields = ['title', 'description', 'status', 'dueDate', 'opportunityId'];
       const setClauses: string[] = ['updated_at = $1'];
-      const queryParams: any[] = [new Date().toISOString()];
+      const queryParams: unknown[] = [new Date().toISOString()];
       let paramIndex = 2;
 
       for (const field of allowedFields) {
@@ -329,22 +329,22 @@ router.put(
         return;
       }
 
-      const row = result.rows[0];
+      const row = result.rows[0] as Record<string, unknown>;
       const task: Task = {
-        id: row.id,
-        title: row.title,
-        description: row.description,
-        status: row.status,
-        dueDate: row.due_date,
-        completedDate: row.completed_date,
-        opportunityId: row.opportunity_id,
-        userId: row.user_id,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at
+        id: row.id as string,
+        title: row.title as string,
+        description: row.description as string,
+        status: row.status as 'pending' | 'in_progress' | 'completed',
+        dueDate: row.due_date as string,
+        completedDate: row.completed_date as string | null,
+        opportunityId: row.opportunity_id as string,
+        userId: row.user_id as string,
+        createdAt: row.created_at as string,
+        updatedAt: row.updated_at as string
       };
 
       res.status(200).json(task);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating task:', error);
       res.status(500).json({ error: 'Failed to update task' });
     }
@@ -363,7 +363,7 @@ router.delete(
     param('id').isUUID().withMessage('id must be a valid UUID')
   ],
   handleValidationErrors,
-  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
       const userId = req.user?.userId;
@@ -384,9 +384,9 @@ router.delete(
       }
 
       res.status(200).json({ success: true });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error deleting task:', error);
-      res.status(500).json({ error: 'Failed to delete task' });
+      next(error);
     }
   }
 );

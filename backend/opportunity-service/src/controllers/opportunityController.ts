@@ -4,10 +4,9 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { query, getPool } from '../../../shared/db';
-import { authMiddleware, AuthenticatedRequest } from '../../../shared/auth';
-import { Opportunity, OpportunityCreate, OpportunityStage, OPPORTUNITY_STAGES } from '../../../shared/types';
-import { v4 as uuidv4 } from 'uuid';
+import { query } from '../../shared/db';
+import { AuthenticatedRequest } from '../../shared/auth';
+import { Opportunity, OpportunityCreate, OpportunityStage, OPPORTUNITY_STAGES } from '../../shared/types';
 
 // Validation helper
 function isValidStage(stage: string): stage is OpportunityStage {
@@ -28,14 +27,14 @@ export async function getAllOpportunities(
       FROM opportunities
     `;
     
-    const params: any[] = [];
+    const params: unknown[] = [];
     
     if (userId) {
       sql += ' WHERE owner_id = $1';
       params.push(userId);
     }
     
-    sql += ' ORDER BY created_at DESC';
+    sql += ' ORDER BY create_at DESC';
     
     const result = await query<Opportunity>(sql, params);
     res.json(result.rows);
@@ -102,7 +101,7 @@ export async function createOpportunity(
       return;
     }
     
-    const id = uuidv4();
+    const id = crypto.randomUUID();
     const now = new Date().toISOString();
     
     const sql = `
@@ -146,7 +145,7 @@ export async function updateOpportunity(
     }
     
     const updates: string[] = [];
-    const params: any[] = [];
+    const params: unknown[] = [];
     let paramIndex = 1;
     
     if (data.name !== undefined) {
