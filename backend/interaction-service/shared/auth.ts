@@ -5,7 +5,7 @@
  */
 
 import jwt from 'jsonwebtoken';
-import { Request, NextFunction } from 'express';
+import { Request, Response as ExpressResponse, NextFunction, RequestHandler } from 'express';
 import bcrypt from 'bcrypt';
 
 export interface TokenPayload {
@@ -85,8 +85,8 @@ export async function hashPassword(password: string): Promise<string> {
  * });
  * ```
  */
-export function authMiddleware() {
-  return (req: AuthenticatedRequest, _res: Response, next: NextFunction) => {
+export function authMiddleware(): RequestHandler {
+  return (req: Request, _res: ExpressResponse, next: NextFunction) => {
     const authHeader = req.headers.authorization;
     const token = extractTokenFromHeader(authHeader);
 
@@ -96,7 +96,7 @@ export function authMiddleware() {
 
     try {
       const decoded = verifyToken(token);
-      req.user = decoded;
+      (req as AuthenticatedRequest).user = decoded;
       next();
     } catch (err) {
       return _res.status(401).json({ error: 'Invalid token' });
@@ -108,18 +108,18 @@ export function authMiddleware() {
  * Optional auth middleware - attaches user if token present but doesn't require it
  * Useful for endpoints that can work with or without authentication
  */
-export function optionalAuthMiddleware() {
-  return (req: AuthenticatedRequest, _res: Response, next: NextFunction) => {
+export function optionalAuthMiddleware(): RequestHandler {
+  return (req: Request, _res: ExpressResponse, next: NextFunction) => {
     const authHeader = req.headers.authorization;
     const token = extractTokenFromHeader(authHeader);
 
     if (token) {
       try {
         const decoded = verifyToken(token);
-        req.user = decoded;
+        (req as AuthenticatedRequest).user = decoded;
       } catch (err) {
         // Token invalid - continue without user (optional auth)
-        req.user = undefined;
+        (req as AuthenticatedRequest).user = undefined;
       }
     }
 

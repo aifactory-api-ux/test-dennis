@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response as ExpressResponse, NextFunction, RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 
@@ -40,8 +40,8 @@ export function comparePassword(password: string, hash: string): boolean {
   return newHash === hashMatch;
 }
 
-export function authMiddleware() {
-  return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export function authMiddleware(): RequestHandler {
+  return (req: Request, res: ExpressResponse, next: NextFunction) => {
     const authHeader = req.headers.authorization;
     const token = extractTokenFromHeader(authHeader);
     if (!token) {
@@ -49,7 +49,7 @@ export function authMiddleware() {
     }
     try {
       const decoded = verifyToken(token);
-      req.user = decoded;
+      (req as AuthenticatedRequest).user = decoded;
       next();
     } catch (err) {
       return res.status(401).json({ error: 'Invalid token' });

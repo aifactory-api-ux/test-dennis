@@ -41,10 +41,10 @@ router.get(
     query('opportunityId').optional().isUUID().withMessage('opportunityId must be a valid UUID')
   ],
   handleValidationErrors,
-  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       const { opportunityId } = req.query;
-      const userId = req.user?.userId;
+      const userId = (req as AuthenticatedRequest).user?.userId;
 
       if (!userId) {
         res.status(401).json({ error: 'Unauthorized' });
@@ -98,10 +98,10 @@ router.post(
     body('content').isString().notEmpty().withMessage('content is required')
   ],
   handleValidationErrors,
-  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       const { opportunityId, type, content } = req.body as InteractionCreate;
-      const userId = req.user?.userId;
+      const userId = (req as AuthenticatedRequest).user?.userId;
 
       if (!userId) {
         res.status(401).json({ error: 'Unauthorized' });
@@ -149,10 +149,10 @@ router.get(
     query('status').optional().isIn(['pending', 'in_progress', 'completed']).withMessage('status must be one of: pending, in_progress, completed')
   ],
   handleValidationErrors,
-  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       const { opportunityId, status } = req.query;
-      const userId = req.user?.userId;
+      const userId = (req as AuthenticatedRequest).user?.userId;
 
       if (!userId) {
         res.status(401).json({ error: 'Unauthorized' });
@@ -219,10 +219,10 @@ router.post(
     body('opportunityId').isUUID().withMessage('opportunityId must be a valid UUID')
   ],
   handleValidationErrors,
-  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       const { title, description, status, dueDate, opportunityId } = req.body as TaskCreate;
-      const userId = req.user?.userId;
+      const userId = (req as AuthenticatedRequest).user?.userId;
 
       if (!userId) {
         res.status(401).json({ error: 'Unauthorized' });
@@ -278,11 +278,11 @@ router.put(
     body('opportunityId').optional().isUUID().withMessage('opportunityId must be a valid UUID')
   ],
   handleValidationErrors,
-  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
       const updates = req.body;
-      const userId = req.user?.userId;
+      const userId = (req as AuthenticatedRequest).user?.userId;
 
       if (!userId) {
         res.status(401).json({ error: 'Unauthorized' });
@@ -363,10 +363,10 @@ router.delete(
     param('id').isUUID().withMessage('id must be a valid UUID')
   ],
   handleValidationErrors,
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
-      const userId = req.user?.userId;
+      const userId = (req as AuthenticatedRequest).user?.userId;
 
       if (!userId) {
         res.status(401).json({ error: 'Unauthorized' });
