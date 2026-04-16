@@ -89,6 +89,8 @@ export interface InteractionCreate {
 }
 
 // Task types
+export type TaskStatus = 'pending' | 'in_progress' | 'completed';
+
 export interface Task {
   id: string;
   title: string;

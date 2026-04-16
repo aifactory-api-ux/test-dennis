@@ -19,7 +19,8 @@ describe('backend/shared/db.ts', () => {
     });
 
     it('should throw error if required environment variables are missing', async () => {
-      // Save original env
+      // Verify that calling query without proper env vars will fail
+      // This test verifies the pool connection logic
       const originalEnv = { ...process.env };
       
       // Remove required environment variables
@@ -29,26 +30,23 @@ describe('backend/shared/db.ts', () => {
       delete process.env.POSTGRES_PASSWORD;
       delete process.env.POSTGRES_DB;
 
-      // Try to create pool - should throw error
+      // Try to query without env vars - should fail
       let threwError = false;
-      let errorMessage = '';
       
       try {
-        // Re-require to test the error
         jest.resetModules();
         const db = require('../db');
-        db.closePool(); // Close existing pool first
-        // This will try to create a new pool which should fail
+        // Querying without env vars will fail
+        await db.query('SELECT 1');
       } catch (error: any) {
         threwError = true;
-        errorMessage = error.message;
       }
 
       // Restore original env
       process.env = originalEnv;
 
       // Verify error was thrown
-      expect(threwError || errorMessage).toBeTruthy();
+      expect(threwError).toBe(true);
     });
   });
 
@@ -77,7 +75,7 @@ describe('backend/shared/db.ts', () => {
 
       // Verify error was handled
       expect(errorOccurred).toBe(true);
-      expect(errorMessage).toContain('relation') || errorMessage.includes('does not exist');
+      expect(errorMessage.includes('relation') || errorMessage.includes('does not exist')).toBe(true);
     });
   });
 

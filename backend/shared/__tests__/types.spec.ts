@@ -38,12 +38,9 @@ describe('OpportunityStage Type', () => {
   });
 
   it('should only accept string type for stage validation', () => {
-    // @ts-expect-error - Testing invalid input
-    expect(isValidOpportunityStage(null)).toBe(false);
-    // @ts-expect-error - Testing invalid input
-    expect(isValidOpportunityStage(undefined)).toBe(false);
-    // @ts-expect-error - Testing invalid input
-    expect(isValidOpportunityStage(123)).toBe(false);
+    expect(isValidOpportunityStage(null as any)).toBe(false);
+    expect(isValidOpportunityStage(undefined as any)).toBe(false);
+    expect(isValidOpportunityStage(123 as any)).toBe(false);
   });
 
   it('should have correct type narrowing with type predicate', () => {
@@ -79,12 +76,9 @@ describe('InteractionType Type', () => {
   });
 
   it('should only accept string type for type validation', () => {
-    // @ts-expect-error - Testing invalid input
-    expect(isValidInteractionType(null)).toBe(false);
-    // @ts-expect-error - Testing invalid input
-    expect(isValidInteractionType(undefined)).toBe(false);
-    // @ts-expect-error - Testing invalid input
-    expect(isValidInteractionType(0)).toBe(false);
+    expect(isValidInteractionType(null as any)).toBe(false);
+    expect(isValidInteractionType(undefined as any)).toBe(false);
+    expect(isValidInteractionType(0 as any)).toBe(false);
   });
 
   it('should have correct type narrowing with type predicate', () => {
